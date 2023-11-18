@@ -1,0 +1,19 @@
+{
+  "name": "fa-script",
+  "version": "1.0.0",
+  "description": "Find and sh script with Electron.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "karino2",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^27.1.0"
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.2",
+    "html-entities": "^2.4.0"
+  }
+}

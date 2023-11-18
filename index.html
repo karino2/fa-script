@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja-JP"">
+  <head>
+    <meta charset="UTF-8">
+    <title>Script FAR, Scriptable Find and Replace</title>
+    <style>
+      .result-pain {
+        display: flex;
+      }
+      details > ul {
+        margin-block-start: 0;
+        margin-block-end: 0;        
+      }
+      .is-active {
+            background-color: #485fc7;
+            color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Script FAR</h1>
+    RootDir: <input id="root-dir" type="text" size="100" value="/Users/arinokazuma/work/GitHub/polygon" />  Glob: <input id="glob-pat" type="text" size="30" value="**/*.c, **/*.cpp, **/*.h, **/*.hpp" /><br>
+    Begin Pat: <input id="search-pat" type="text" size="150" value="__NEET_PIXEL_LOCKER__" /><br>
+    End Pat: <input id="end-search-pat" type="text" size="150" value="" /><br>
+    <button id="submit-search">Start Search</button><br>
+    <div class="result-pain">
+      <div id="search-result"></div>
+      <div class="scripts">
+        <textarea id="script" rows="18" cols="160"></textarea><br>
+        <button id="apply">Apply</button> <button id="submit-result">Submit</button> <button id="skip">Skip</button><br><br>
+        <textarea id="before" rows="18" cols="160"></textarea><br>
+        <textarea id="after" rows="18" cols="160"></textarea>
+      </div>
+    </div>
+  </body>
+</html>
