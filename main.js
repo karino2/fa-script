@@ -44,8 +44,6 @@ let g_lines = [] // 現在のファイルの行にsplitしたもの
 
 /** @type {RegExp} */
 let g_begPat = undefined
-/** @type {RegExp} */
-let g_endPat = undefined
 let g_endPatStr = ""
 
 let g_eol = "\n"
@@ -77,19 +75,16 @@ const guessEOL = (content) => {
   }
 }
 
-const readLinesFullPath = async (fpath) => {
+const readLinesWithGuess = async (rpath) => {
+  const fpath = path.join(g_rootDir, rpath)
   const content = await fs.readFile(fpath, {encoding: "utf-8"})
   guessEOL(content)
   return content.split(g_eol)
 }
 
-const readLines = async (rpath) => {
-  const fpath = path.join(g_rootDir, rpath)
-  return await readLinesFullPath(fpath)
-}
-
 const readTmpFileLines = async(rpath) => {
-  return await readLinesFullPath(path.join(g_outputRoot, rpath))
+  const content = await fs.readFile(path.join(g_outputRoot, rpath), {encoding: "utf-8"})
+  return content.split(g_eol)
 }
 
 const writeTmpFile = async (rpath, text, mode=0o666) => {
@@ -122,7 +117,7 @@ const runScript = async (rpath) => {
  * @returns {MatchRes}
  *  */
 const listMatches = async (rpath, regPat)=> {
-  const lines = await readLines(rpath)
+  const lines = await readLinesWithGuess(rpath)
   const res = []
   for(const [index, line] of lines.entries()) {
     if(line.match(regPat)) {
@@ -182,7 +177,7 @@ const buildMatchListHtml = (matchRes) => {
 }
 
 const selectSearchResult = async(event, rpath, indexStr, endpat) => {
-  const lines = await readLines(rpath)
+  const lines = await readLinesWithGuess(rpath)
   const index = Number(indexStr)
   const from = index
   const endPos = findEndPos(lines, index, endpat)
@@ -227,14 +222,30 @@ ipcMain.on("start-search", async(event, rootDir, globPat, searchPat, endPat)=> {
   }
 })
 
-const findEndPos = (lines, from, endpat) => {
-  if (endpat == "") {
-    g_endPat = undefined
+const g_endNumPat = /\+([0-9]+)/
+
+/**
+ * 
+ * 
+ * @param {string[]} lines 
+ * @param {number} from 
+ * @param {string} endpatStr - endpatStrは三種類ある。空文字列、+12型の数字、そして文字列。+12などはfromに12を足した結果を返す。
+ * @returns 
+ */
+const findEndPos = (lines, from, endpatStr) => {
+  if (endpatStr == "") {
     return Math.min(from+10, lines.length)
   }
-  g_endPat = new RegExp(endpat)
+
+  const numRes = endpatStr.match(g_endNumPat);
+  if(numRes)
+  {
+    return Math.min(from+Number(numRes[1]), lines.length)
+  }
+
+  let endPat = new RegExp(endpatStr)
   for(let i = from+1; i < lines.length; i++) {
-    if(lines[i].match(g_endPat))
+    if(lines[i].match(endPat))
       return i+1
   }
   // not found, return the same pos.
